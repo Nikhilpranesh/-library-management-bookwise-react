@@ -106,11 +106,12 @@ exports.userDetails = (req, res) => {
     res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
     console.log(req.user);
 };
-exports.logout = (req, res, nect) => {
+exports.logout = (req, res, next) => {
     req.logout(function (err) {
-        if (err) { return next(err); }
-        else {
-            res.status(200).json({ msg: "Logged Out" })
+        if (err) {
+            return res.status(500).json({ msg: "Error during logout", error: err.message });
+        } else {
+            res.status(200).json({ msg: "Logged Out" });
         }
     });
 };

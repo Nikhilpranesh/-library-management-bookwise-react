@@ -138,8 +138,8 @@ const BorrowList = () => {
                     <td style={{ padding: "0.5rem" }}>
                       <input
                         type="checkbox"
-                        onChange={(e) => handleCheckboxChange(e, d.isbn)}
-                        checked={selectedBooks.includes(d.isbn)}
+                        onChange={(e) => handleCheckboxChange(e, d.bookId || d._id)}
+                        checked={selectedBooks.includes(d.bookId || d._id)}
                       />
                     </td>
                   </tr>

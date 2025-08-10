@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const bookSchema = mongoose.Schema(
     {
-        BibNum: { type: String, required: true },
         Title: { type: String, required: true },
         Author: { type: String, required: true },
-        ISBN: { type: String, required: true },
-        Publisher: { type: String, required: true },
+        Price: { type: Number, required: true },
         Genre: { type: String, required: true },
-        ItemCount: { type: String, required: true },
+        Image: { type: String, default: "" },
+        pdfUrl: { type: String, default: "" }, // URL to stored PDF
+        copyType: { type: String, enum: ['hardcopy', 'softcopy', 'both'], default: 'hardcopy' }, // Available copy types
     },
     { timestamps: true }
 );

@@ -10,6 +10,16 @@ import LandingPage from "./pages/Pages/LandingPage";
 import Cart from "./pages/Pages/Cart/Cart";
 import EditProfile from "./pages/Pages/Profile/EditProfile"
 import Borrower from "./pages/Pages/Cart/Borrower";
+import Explore from "./pages/Pages/Explore/Explore";
+import PublicList from "./pages/Pages/Explore/PublicList";
+import Checkout from "./pages/Pages/Checkout/Checkout";
+import OrderConfirmation from "./pages/Pages/Checkout/OrderConfirmation";
+import PublishFavorites from "./pages/Pages/Explore/PublishFavorites";
+
+import Orders from "./pages/Pages/Orders/Orders";
+import Favorites from "./pages/Pages/Favorites/Favorites";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -46,6 +56,11 @@ function App() {
               path="/home"
               element={user ? <HomePage user={user} /> : <SignIn />}
             />
+            <Route exact path="/explore" element={user ? <Explore user={user} /> : <Navigate to="/signin" />} />
+            <Route exact path="/publish" element={<PublishFavorites />} />
+            <Route exact path="/list/:slug" element={<PublicList />} />
+            <Route exact path="/checkout" element={<Checkout />} />
+            <Route exact path="/order/:id" element={<OrderConfirmation />} />
             <Route
               exact
               path="/signup"
@@ -76,6 +91,21 @@ function App() {
               path="/borrower"
               element={user ? <Borrower user={user} /> : <Navigate to="/home" />}
             />
+
+            <Route
+              exact
+              path="/orders"
+              element={user ? <Orders user={user} /> : <Navigate to="/home" />}
+            />
+            <Route
+              exact
+              path="/favorites"
+              element={user ? <Favorites user={user} /> : <Navigate to="/home" />}
+            />
+            
+            {/* Admin Routes */}
+            <Route exact path="/admin/login" element={<AdminLogin />} />
+            <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
           </Routes>
         )}
       </Router>

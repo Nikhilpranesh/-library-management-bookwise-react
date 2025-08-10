@@ -8,8 +8,11 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb-memory-server": "^10.2.0",
     "mongoose": "^6.9.2",
     "morgan": "^1.10.0",
+    "multer": "^2.0.2",
     "nodemon": "^2.0.22",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0"

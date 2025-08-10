@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const recentActivitySchema = mongoose.Schema(
     {
-        isbn: {
-            type: "String",
-            required: true,
+        bookId: {
+            type: String,
+            required: true
         },
         username: {
             type: "String",

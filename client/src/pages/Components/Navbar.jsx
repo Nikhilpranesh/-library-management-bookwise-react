@@ -4,13 +4,14 @@ import "../Assets/css/navbar.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleHomeClick = () => {
-    navigate("/home");
+  const handleExploreClick = () => {
+    navigate("/explore");
   };
 
   const handleRecentlyAddedClick = () => {
@@ -25,7 +26,31 @@ const Navbar = ({ user }) => {
     }
   };
 
+  const handleOrdersClick = () => {
+    navigate("/orders");
+  };
+
+  const handleFavoritesClick = () => {
+    navigate("/favorites");
+  };
+
   const handleLogout = async () => {
+    // Clear user-specific data from localStorage
+    if (user?.username) {
+      const favoritesKey = `bookwise_favorites_${user.username}`;
+      localStorage.removeItem(favoritesKey);
+      
+      // Clear any other user-specific keys that might exist
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.includes(user.username)) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+
     await axios
       .post(`http://localhost:5000/logout`, null, {
         withCredentials: true,
@@ -63,18 +88,27 @@ const Navbar = ({ user }) => {
   // Function to determine whether a link should be underlined
   const isLinkActive = (path) => location.pathname === path;
 
+  // Get user initials for avatar
+  const getUserInitials = (name) => {
+    if (!name) return "U";
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
     <div>
       <div className="nav-top">
         <div className="nav-inner-top">
           <div>
             <div
-              onClick={handleHomeClick}
+              onClick={() => navigate("/home")}
               style={{
                 fontSize: "2.4rem",
-                marginRight: "25rem",
-                fontWeight: "500",
+                fontWeight: "700",
                 cursor: "pointer",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
             >
               bookWise
@@ -83,42 +117,58 @@ const Navbar = ({ user }) => {
           <div className="nav-inner-element">
             <div
               className={`linked ${
-                isLinkActive("/home") ? "underline-link" : ""
+                isLinkActive("/explore") ? "underline-link" : ""
               }`}
-              onClick={handleHomeClick}
+              onClick={handleExploreClick}
             >
-              Books
+              🔍 Explore
             </div>
-          </div>
-          <div className="nav-inner-element">
-            <div
-              className={`linked ${
-                isLinkActive("/borrower") || isLinkActive("/cart")
-                  ? "underline-link"
-                  : ""
-              }`}
-              onClick={handelCart}
-            >
-              {user.userType === "user" ? "Cart" : "Borrower"}
-            </div>
-          </div>
-          <div className="nav-inner-element">
             <div
               className={`linked ${
                 isLinkActive("/profile") ? "underline-link" : ""
               }`}
               onClick={handleRecentlyAddedClick}
             >
-              Profile
+              👤 Profile
+            </div>
+            <div
+              className={`linked ${
+                isLinkActive("/cart") || isLinkActive("/borrower") ? "underline-link" : ""
+              }`}
+              onClick={handelCart}
+            >
+              🛒 {user.userType === "user" ? "Cart" : "Borrower"}
+            </div>
+            <div
+              className={`linked ${
+                isLinkActive("/orders") ? "underline-link" : ""
+              }`}
+              onClick={handleOrdersClick}
+            >
+              📋 Orders
+            </div>
+            <div
+              className={`linked ${
+                isLinkActive("/favorites") ? "underline-link" : ""
+              }`}
+              onClick={handleFavoritesClick}
+            >
+              ❤️ Favorites
             </div>
           </div>
           <div className="nav-inner-element">
-            <div
-              className={`linked ${isLinkActive("/") ? "underline-link" : ""}`}
-              onClick={handleLogout}
-            >
-              Logout
+            <div className="user-profile">
+              <div className="user-avatar">
+                {getUserInitials(user.username)}
+              </div>
+              <div className="user-info">
+                <div className="user-name">{user.username}</div>
+                <div className="user-role">{user.userType}</div>
+              </div>
             </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              🚪 Logout
+            </button>
           </div>
         </div>
       </div>

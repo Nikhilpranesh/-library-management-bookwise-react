@@ -170,8 +170,8 @@ const Lists = ({ user }) => {
                     <td style={{ padding: "0.5rem" }}>
                       <input
                         type="checkbox"
-                        onChange={(e) => handleCheckboxChange(e, d.ISBN)}
-                        checked={selectedBooks.includes(d.ISBN)}
+                        onChange={(e) => handleCheckboxChange(e, d._id)}
+                        checked={selectedBooks.includes(d._id)}
                       />
                     </td>
                   </tr>

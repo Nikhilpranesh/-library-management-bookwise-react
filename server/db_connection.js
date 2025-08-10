@@ -1,20 +1,28 @@
-const mongoose = require("mongoose")
-
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
 require("dotenv").config();
 
 mongoose.set("strictQuery", false);
-const URL = process.env.DB_URL
-try {
 
-    mongoose.connect(URL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
+async function connectToDatabase() {
+  const databaseUrlFromEnvironment = process.env.DB_URL;
+  const connectionOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
-    console.log("Connected To Database");
+  try {
+    if (databaseUrlFromEnvironment && databaseUrlFromEnvironment.trim().length > 0) {
+      await mongoose.connect(databaseUrlFromEnvironment, connectionOptions);
+      console.log("Connected To Database");
+      return;
+    }
 
-} catch (error) {
-
-    console.log("error while loadind the data base", error);
-
+    // Fallback to in-memory MongoDB when DB_URL is not provided
+    const inMemoryServer = await MongoMemoryServer.create();
+    const inMemoryUri = inMemoryServer.getUri();
+    await mongoose.connect(inMemoryUri, connectionOptions);
+    console.log("Connected to in-memory MongoDB (fallback). Note: Data will reset on restart.");
+  } catch (error) {
+    console.log("Error while connecting to the database", error);
+  }
 }
+
+connectToDatabase();

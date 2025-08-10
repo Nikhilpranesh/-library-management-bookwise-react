@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../Assets/css/profile.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,322 +11,132 @@ const Profile = ({ user }) => {
   const formattedDate = date.toLocaleDateString("en-US", options);
 
   const [data, setData] = useState({
-    name: user.name,
-    username: user.username,
-    phone: user.phone,
-    address: user.address,
-    uniqueId: user.uniqueId,
+    name: user.name || "",
+    username: user.username || "",
+    phone: user.phone || "",
+    address: user.address || "",
+    uniqueId: user.uniqueId || "",
   });
+
   const handleInputs = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
-    // setData({ ...data, uniqueId: user.uniqueId });
-    console.log(data);
   };
-  const submitForm = async () => {
-    // alert("Submitted")
-    await axios
-      .post(`http://localhost:5000/updateUser`, data)
-      .then((response) => {
-        var message = response.data.msg;
-        var status = response.status;
-        console.log(message);
 
-        if (status === 200) {
-          toast.success(`${message}`, {
-            position: "top-center",
-            autoClose: 2000,
-            pauseOnHover: false,
-            pauseOnFocusLoss: false,
-            draggable: true,
-            textAlign: "center",
-          });
-          setTimeout(() => {
-            window.location.href = "/profile";
-          }, 1500);
-          // window.location.reload();
-        } else if (status === 202) {
-          toast.warn(`${message}`, {
-            position: "top-center",
-            autoClose: 2000,
-            pauseOnHover: false,
-            pauseOnFocusLoss: false,
-            draggable: true,
-            textAlign: "center",
-          });
-        }
+  const submitForm = async () => {
+    try {
+      const response = await axios.post(`http://localhost:5000/updateUser`, data);
+      const message = response.data.msg;
+      const status = response.status;
+
+      if (status === 200) {
+        toast.success(`${message}`, {
+          position: "top-center",
+          autoClose: 2000,
+          pauseOnHover: false,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          textAlign: "center",
+        });
+        setTimeout(() => {
+          window.location.href = "/profile";
+        }, 1500);
+      } else if (status === 202) {
+        toast.warn(`${message}`, {
+          position: "top-center",
+          autoClose: 2000,
+          pauseOnHover: false,
+          pauseOnFocusLoss: false,
+          draggable: true,
+          textAlign: "center",
+        });
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error("Failed to update profile", {
+        position: "top-center",
+        autoClose: 2000,
+        pauseOnHover: false,
+        pauseOnFocusLoss: false,
+        draggable: true,
+        textAlign: "center",
       });
+    }
   };
 
   return (
-    <div style={{ paddingBlockStart: "4rem" }}>
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: "1" }}>
-          <div
-            style={{
-              margin: "1rem",
-              borderRadius: "2rem 2rem 2rem 2rem",
-              backgroundColor: "#3d5a80",
-              padding: "1rem",
-              boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "20px",
-                  height: "20px",
-                  borderRadius: "50%",
-                  backgroundColor: "white",
-                }}
-              ></div>
-            </div>
-            <div>
-              <img
-                style={{ width: "15rem" }}
-                src="https://api.multiavatar.com/Starcrasher.png?apikey=dIwKHchoCn6x9k"
-                alt=""
-                srcset=""
+    <div className="profile-container">
+      <div className="profile-content">
+        <div className="profile-header fade-in">
+          <div className="profile-name">{data.name || user.username}</div>
+          <div className="profile-username">@{user.username}</div>
+          <div className="profile-role">{user.userType}</div>
+          <div style={{ marginTop: "1rem", color: "#7f8c8d" }}>
+            Member since {formattedDate}
+          </div>
+        </div>
+
+        <div className="profile-form slide-in-left">
+          <div className="profile-form-title">Edit Profile</div>
+          <div className="profile-form-grid">
+            <div className="profile-field">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={data.name}
+                onChange={handleInputs}
+                placeholder="Enter your full name"
               />
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "1rem",
-                fontWeight: "600",
-                fontSize: "1.5rem",
-                color: "white",
-              }}
-            >
-              {user.name}
+            <div className="profile-field">
+              <label>Username</label>
+              <input
+                type="text"
+                name="username"
+                value={data.username}
+                onChange={handleInputs}
+                placeholder="Enter username"
+                disabled
+              />
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              UID : <span>{user.uniqueId}</span>
+            <div className="profile-field">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={data.phone}
+                onChange={handleInputs}
+                placeholder="Enter phone number"
+              />
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              Email : {user.username}
+            <div className="profile-field">
+              <label>Address</label>
+              <input
+                type="text"
+                name="address"
+                value={data.address}
+                onChange={handleInputs}
+                placeholder="Enter your address"
+              />
             </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              Phone : {user.phone}
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              Joined on{" "}
-              <span style={{ color: "#a0a2a1" }}>{formattedDate}</span>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              Nothing <span style={{ color: "#2bea2b" }}>Borrowed</span>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                fontFamily: "poppins",
-                marginBlockStart: "0.5rem",
-                fontWeight: "600",
-                fontSize: "1rem",
-                color: "white",
-              }}
-            >
-              <span style={{ color: "yellow" }}> {user.cart.length} </span>{" "}
-              items in{" "}
-              <a
-                style={{ color: "#539cda", textDecoration: "none" }}
-                href="/cart"
-              >
-                cart
-              </a>
+            <div className="profile-field">
+              <label>Unique ID</label>
+              <input
+                type="text"
+                name="uniqueId"
+                value={data.uniqueId}
+                onChange={handleInputs}
+                placeholder="Enter unique ID"
+                disabled
+              />
             </div>
           </div>
-        </div>
-        <div style={{ flex: "3", display: "flex", flexDirection: "column" }}>
-          <div>
-            <div
-              style={{
-                margin: "1rem",
-                backgroundColor: "white",
-                borderRadius: "2rem",
-                boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
-              }}
-            >
-              <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "1rem 0 0 1rem",
-                  fontSize: "2rem",
-                  fontWeight: "600",
-                  fontFamily: "poppins",
-                }}
-              >
-                Edit Your Profile
-              </div>
-              <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "0.5rem",
-                }}
-              >
-                <input
-                  style={{ width: "60%" }}
-                  type="text"
-                  class="login-input"
-                  name="name"
-                  placeholder="Name"
-                  defaultValue={user.name}
-                  onChange={(e) => handleInputs(e)}
-                />
-              </div>
-              <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "0.5rem",
-                }}
-              >
-                <input
-                  style={{ width: "60%" }}
-                  type="email"
-                  class="login-input"
-                  name="username"
-                  placeholder="Email"
-                  defaultValue={user.username}
-                  onChange={(e) => handleInputs(e)}
-                />
-              </div>
-              <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "0.5rem",
-                }}
-              >
-                <input
-                  style={{ width: "30%" }}
-                  type="number"
-                  class="login-input"
-                  name="phone"
-                  defaultValue={user.phone}
-                  placeholder="Phone"
-                  onChange={(e) => handleInputs(e)}
-                />
-              </div>
-              <div
-                style={{
-                  margin: "0.5rem",
-                  display: "flex",
-                  padding: "0.5rem 0.5rem 2rem 0.5rem",
-                }}
-              >
-                <input
-                  style={{ width: "90%" }}
-                  type="text"
-                  class="login-input"
-                  name="address"
-                  placeholder="Address"
-                  defaultValue={user.address}
-                  // onChange={(e) => handleInputs(e)}
-                />
-                <span onClick={submitForm} className="profile-button">
-                  Update
-                </span>
-                <ToastContainer />
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  margin: "1rem",
-                  backgroundColor: "white",
-                  borderRadius: "2rem",
-                  boxShadow: "1px 1px 21px -3px rgba(0,0,0,10.75)",
-                }}
-              >
-                <div
-                  style={{
-                    margin: "0.5rem",
-                    display: "flex",
-                    padding: "1rem 0 0 1rem",
-                    fontSize: "2rem",
-                    fontWeight: "600",
-                    fontFamily: "poppins",
-                  }}
-                >
-                  Any Query Or Feedbak ?
-                </div>
-                <div
-                  style={{
-                    margin: "0.5rem",
-                    display: "flex",
-                    padding: "0.5rem",
-                  }}
-                >
-                  <textarea
-                    style={{ width: "100%", fontFamily: "poppins" }}
-                    type="text"
-                    class="login-input"
-                    name="query"
-                    placeholder="Write Something ..."
-                    defaultValue="I like to suggest You ....."
-                    rows={6}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <button className="profile-button" onClick={submitForm}>
+            Update Profile
+          </button>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
